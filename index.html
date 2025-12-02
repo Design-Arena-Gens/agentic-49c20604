@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laurent Series Learning Guide ? Part VIII</title>
+  <meta name="description" content="An expertly designed first-principles guide to Laurent series convergence regions and contour integration, with KaTeX-rendered math and Overleaf-ready LaTeX." />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            ink: '#0f172a',
+            paper: '#0b1020',
+            accent: {
+              50: '#f5f8ff', 100: '#e6efff', 200: '#cfe0ff', 300: '#aecdff', 400: '#86b0ff', 500: '#5a8fff', 600: '#3b72f6', 700: '#2858d7', 800: '#1f47ad', 900: '#1c3e8b'
+            },
+            mint: {
+              50: '#edfff8', 100: '#d4fceb', 200: '#aaf6d8', 300: '#79e9c0', 400: '#4bd6a4', 500: '#27be8a', 600: '#169e73', 700: '#117b5b', 800: '#0e614a', 900: '#0e4f3e'
+            },
+            rose: {
+              50: '#fff1f2', 100: '#ffe4e6', 200: '#fecdd3', 300: '#fda4af', 400: '#fb7185', 500: '#f43f5e', 600: '#e11d48', 700: '#be123c', 800: '#9f1239', 900: '#881337'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasH0b/KHE" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgONoEJ5E1v6NN8p3F3afsV8hrp7rseC0T0C5bI7a0l6s2" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycQp+7GJv7QSaHNVZt9g5d2e2mXHBOB2EFVJ7GZ9L8qfc0B5hQ0O" crossorigin="anonymous"
+    onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}]});"></script>
+
+  <style>
+    html, body { background: radial-gradient(1200px 800px at 10% 0%, #0b1020 0%, #0a0e1a 45%, #070b14 100%); }
+    .glass { backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.06); }
+    .code-scroll { scrollbar-color: #5a8fff #0b1020; }
+  </style>
+</head>
+<body class="text-slate-100 antialiased">
+  <main class="max-w-5xl mx-auto px-4 py-10">
+    <!-- Header -->
+    <header class="mb-8">
+      <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-accent-800/40 ring-1 ring-accent-500/30">
+        <span class="h-2 w-2 rounded-full bg-mint-400 animate-pulse"></span>
+        <span class="text-sm tracking-wide text-accent-100">Complex Analysis ? First Principles Learning Guide</span>
+      </div>
+      <h1 class="mt-4 text-3xl md:text-4xl font-semibold text-accent-100">
+        Part VIII ? Laurent Series, Annuli of Convergence, and Contour Integrals
+      </h1>
+      <p class="mt-2 text-slate-300 max-w-3xl">We study the Laurent series
+        <span class="font-mono">\(\displaystyle\sum_{n=1}^{\infty} \frac{1}{z^n} + \sum_{n=0}^{\infty} \frac{z^n}{5^n}\)</span>,
+        determine its largest annulus of convergence, then compute the contour integral of the squared sum on \(|z|=2\). Designed for intuition, rigor, and transfer.</p>
+    </header>
+
+    <!-- Problem Statement Card -->
+    <section class="glass rounded-2xl p-6 ring-1 ring-white/10 shadow-xl">
+      <h2 class="text-xl font-semibold text-accent-100">Problem</h2>
+      <div class="mt-3 space-y-3 text-slate-200">
+        <p><strong>(i)</strong> Consider the Laurent series
+          \[ \sum_{n=1}^{\infty} \frac{1}{z^n} + \sum_{n=0}^{\infty} \frac{z^n}{5^n}. \]
+          Determine the <span class="text-mint-300 font-medium">largest annulus</span>
+          \( D = \{ z\in\mathbb{C} : r < |z| < R\} \) in which this series converges.
+        </p>
+        <p><strong>(ii)</strong> If \(f: D\to\mathbb{C}\) is the sum of this series on the annulus from (i), compute
+          \[ \int_{|z|=2} (f(z))^2\,dz. \]
+        </p>
+      </div>
+    </section>
+
+    <!-- First Principles: Definitions -->
+    <section class="mt-8 grid md:grid-cols-2 gap-6">
+      <div class="glass rounded-2xl p-6 ring-1 ring-white/10">
+        <h3 class="text-lg font-semibold text-accent-100">Definitions and First Principles</h3>
+        <ul class="mt-3 space-y-3 text-slate-200">
+          <li class="border-l-2 border-mint-400 pl-3">
+            <strong class="text-mint-300">Laurent series</strong>: A representation of a function as
+            \( \displaystyle\sum_{n=-\infty}^{\infty} a_n (z-z_0)^n \), convergent on an annulus centered at \(z_0\).
+          </li>
+          <li class="border-l-2 border-accent-400 pl-3">
+            <strong class="text-accent-200">Geometric series</strong>:
+            \( \displaystyle\sum_{n=0}^{\infty} r^n = \frac{1}{1-r} \) for \(|r|<1\).
+          </li>
+          <li class="border-l-2 border-rose-400 pl-3">
+            <strong class="text-rose-200">Annulus of convergence</strong>:
+            intersection of regions where each component series converges.
+          </li>
+        </ul>
+      </div>
+      <div class="glass rounded-2xl p-6 ring-1 ring-white/10">
+        <h3 class="text-lg font-semibold text-accent-100">Quick Intuition</h3>
+        <p class="mt-2 text-slate-200">Our series splits into a ?negative powers? part and a ?positive powers? part:
+          \[ \sum_{n=1}^{\infty} z^{-n} \quad\text{and}\quad \sum_{n=0}^{\infty} \left(\tfrac{z}{5}\right)^n. \]
+          The first requires \(|z|>1\); the second requires \(|z|<5\). The function lives where both are true: an annulus
+          \(1<|z|<5\).</p>
+      </div>
+    </section>
+
+    <!-- (i) Region of Convergence -->
+    <section class="mt-8 grid md:grid-cols-2 gap-6">
+      <div class="glass rounded-2xl p-6 ring-1 ring-white/10">
+        <h3 class="text-lg font-semibold text-mint-200">(i) Largest Annulus of Convergence</h3>
+        <div class="mt-3 space-y-3 text-slate-200">
+          <p>We analyze each sum as a geometric series.</p>
+          <ul class="list-disc list-inside space-y-2">
+            <li><span class="text-mint-300 font-medium">Negative powers</span>:
+              \( \sum_{n=1}^{\infty} z^{-n} = \sum_{n=1}^{\infty} (1/z)^n \) converges iff \(|1/z|<1\), i.e. \(|z|>1\).</li>
+            <li><span class="text-accent-300 font-medium">Positive powers</span>:
+              \( \sum_{n=0}^{\infty} (z/5)^n \) converges iff \(|z/5|<1\), i.e. \(|z|<5\).</li>
+          </ul>
+          <p class="mt-2">Therefore the <strong>largest annulus</strong> is
+            \[ \boxed{\; D = \{z\in\mathbb{C} : 1<|z|<5\} \;} \]
+            and this is maximal since each bound is sharp for geometric series.</p>
+          <p class="mt-2">Within \(D\), the sums evaluate to
+            \[ \sum_{n=1}^{\infty} z^{-n} = \frac{\frac{1}{z}}{1-\frac{1}{z}} = \frac{1}{z-1}, \qquad
+               \sum_{n=0}^{\infty} \left(\frac{z}{5}\right)^n = \frac{1}{1-\frac{z}{5}} = \frac{5}{5-z}. \]
+            So
+            \[ f(z) = \frac{1}{z-1} + \frac{5}{5-z} = \frac{1}{z-1} - \frac{5}{z-5}. \]
+          </p>
+        </div>
+      </div>
+
+      <!-- Visualization: Annulus -->
+      <div class="glass rounded-2xl p-6 ring-1 ring-white/10">
+        <h3 class="text-lg font-semibold text-accent-100">Visual: The Annulus</h3>
+        <div class="mt-4 flex items-center justify-center">
+          <svg viewBox="0 0 300 300" class="w-full max-w-sm">
+            <defs>
+              <radialGradient id="annulusGrad" r="60%">
+                <stop offset="0%" stop-color="#0b1020" />
+                <stop offset="55%" stop-color="#1f47ad" stop-opacity="0.5" />
+                <stop offset="100%" stop-color="#0b1020" />
+              </radialGradient>
+            </defs>
+            <!-- Background -->
+            <rect x="0" y="0" width="300" height="300" fill="url(#annulusGrad)" />
+            <!-- Outer circle R=5 (scaled) -->
+            <circle cx="150" cy="150" r="120" fill="none" stroke="#5a8fff" stroke-width="2" stroke-dasharray="6 6" />
+            <!-- Inner circle r=1 (scaled) -->
+            <circle cx="150" cy="150" r="24" fill="none" stroke="#27be8a" stroke-width="2" stroke-dasharray="4 6" />
+            <!-- Contour |z|=2 -->
+            <circle cx="150" cy="150" r="48" fill="none" stroke="#f43f5e" stroke-width="2" />
+            <!-- Axes -->
+            <line x1="0" y1="150" x2="300" y2="150" stroke="#94a3b8" stroke-opacity="0.4" />
+            <line x1="150" y1="0" x2="150" y2="300" stroke="#94a3b8" stroke-opacity="0.4" />
+            <!-- Labels -->
+            <text x="272" y="146" fill="#9fb9ff" font-size="12">|z|=5</text>
+            <text x="70" y="146" fill="#7ee9c0" font-size="12">|z|=1</text>
+            <text x="208" y="146" fill="#fda4af" font-size="12">|z|=2</text>
+            <circle cx="150" cy="150" r="3" fill="#e2e8f0" />
+          </svg>
+        </div>
+        <p class="mt-3 text-sm text-slate-300 text-center">Annulus of convergence: 1 < |z| < 5. The integration contour is the circle |z|=2.</p>
+      </div>
+    </section>
+
+    <!-- (ii) Integral of (f(z))^2 -->
+    <section class="mt-8 grid md:grid-cols-2 gap-6">
+      <div class="glass rounded-2xl p-6 ring-1 ring-white/10">
+        <h3 class="text-lg font-semibold text-mint-200">(ii) Compute \(\displaystyle \int_{|z|=2} (f(z))^2\,dz\)</h3>
+        <div class="mt-3 space-y-3 text-slate-200">
+          <p>We have \( f(z) = \dfrac{1}{z-1} - \dfrac{5}{z-5} \). Poles are at \(z=1\) and \(z=5\). On \(|z|=2\), only \(z=1\) lies inside.</p>
+          <div class="rounded-lg bg-black/30 ring-1 ring-white/10 p-4">
+            <p class="text-sm text-accent-100 font-semibold">Method A ? Residue via principal part expansion (fastest)</p>
+            <p class="mt-2">Write \( f(z) = \dfrac{1}{z-1} + a(z) \) with \( a(z) = -\dfrac{5}{z-5} \) analytic near 1 and \( a(1)=\dfrac{5}{4} \). Then
+              \[ f(z)^2 = \frac{1}{(z-1)^2} + \frac{2a(1)}{z-1} + \cdots \]
+              so \( \operatorname{Res}_{z=1} f(z)^2 = 2a(1) = \dfrac{5}{2} \). Therefore
+              \[ \int_{|z|=2} (f(z))^2\,dz = 2\pi i\,\operatorname{Res}_{z=1} f(z)^2 = 2\pi i\cdot\frac{5}{2} = \boxed{5\pi i}. \]
+            </p>
+          </div>
+          <div class="rounded-lg bg-black/30 ring-1 ring-white/10 p-4">
+            <p class="text-sm text-accent-100 font-semibold">Method B ? Expand and read residue directly</p>
+            <p class="mt-2">
+              Expand
+              \[ (f(z))^2 = \left(\frac{1}{z-1} - \frac{5}{z-5}\right)^2 = \frac{1}{(z-1)^2} - \frac{10}{(z-1)(z-5)} + \frac{25}{(z-5)^2}. \]
+              Only the middle term has a simple pole at \(z=1\): its residue is
+              \( -\dfrac{10}{1-5} = \dfrac{5}{2} \). Thus the integral is again \( 2\pi i\cdot\dfrac{5}{2} = \boxed{5\pi i} \).
+            </p>
+          </div>
+          <div class="rounded-lg bg-black/30 ring-1 ring-white/10 p-4">
+            <p class="text-sm text-accent-100 font-semibold">Method C ? Second-order pole formula</p>
+            <p class="mt-2">Since \(z=1\) is a double pole of \(f^2\), use
+              \[ \operatorname{Res}_{z=1} f(z)^2 = \lim_{z\to 1} \frac{d}{dz}\Big((z-1)^2 f(z)^2\Big), \]
+              which differentiates a rational function and yields \(\dfrac{5}{2}\). Same conclusion: \(\boxed{5\pi i}\).
+            </p>
+          </div>
+          <p class="text-slate-300">All methods agree; Method A is most efficient in practice.</p>
+        </div>
+      </div>
+
+      <!-- Justification & Edge Cases -->
+      <div class="glass rounded-2xl p-6 ring-1 ring-white/10">
+        <h3 class="text-lg font-semibold text-accent-100">Why This Is Correct</h3>
+        <ul class="mt-3 space-y-3 text-slate-200">
+          <li class="border-l-2 border-mint-400 pl-3"><strong>Convergence bounds are sharp</strong> for geometric series; equality \(|z|=1\) or \(|z|=5\) fails convergence, so the annulus cannot be extended.</li>
+          <li class="border-l-2 border-accent-400 pl-3"><strong>Residues determine contour integrals</strong> of meromorphic functions: only enclosed poles contribute.</li>
+          <li class="border-l-2 border-rose-400 pl-3"><strong>Double-pole structure</strong> at \(z=1\) explains why the integral reduces to the coefficient of \(1/(z-1)\) in the local expansion of \(f^2\); the \(1/(z-1)^2\) term integrates to 0 by Cauchy?s formula with constant numerator.</li>
+        </ul>
+        <div class="mt-4 text-sm text-slate-300">
+          Final results:
+          <div class="mt-2 rounded-lg bg-black/40 p-3 ring-1 ring-white/10">
+            \[ \boxed{\; D = \{ z\in\mathbb{C} : 1<|z|<5 \} \;} \quad\text{and}\quad \boxed{\; \int_{|z|=2} (f(z))^2\,dz = 5\pi i \;}. \]
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Overleaf-ready LaTeX -->
+    <section class="mt-8 glass rounded-2xl p-6 ring-1 ring-white/10">
+      <div class="flex items-center justify-between gap-4">
+        <h3 class="text-lg font-semibold text-mint-200">Overleaf-ready LaTeX</h3>
+        <button id="copyBtn" class="px-3 py-1.5 text-sm rounded-md bg-accent-600 hover:bg-accent-700 active:bg-accent-800 transition text-white">Copy</button>
+      </div>
+      <pre class="mt-3 p-4 bg-black/50 rounded-xl overflow-x-auto code-scroll text-sm" id="latexBlock"><code>\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm, mathtools}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\definecolor{accent}{HTML}{5A8FFF}
+\definecolor{mint}{HTML}{27BE8A}
+\definecolor{rose}{HTML}{F43F5E}
+\definecolor{ink}{HTML}{0F172A}
+\pagecolor[rgb]{0.05,0.07,0.12}\color{white}
+\newtcolorbox{card}[1]{enhanced, colback=black!20, colframe=white!20, boxrule=0.4pt, arc=6pt, title=#1}
+\begin{document}
+\section*{Part VIII ? Laurent Series and Contour Integrals}
+\begin{card}{Problem}
+(i) Consider the Laurent series $\displaystyle\sum_{n=1}^{\infty} \frac{1}{z^n} + \sum_{n=0}^{\infty} \frac{z^n}{5^n}$. Determine the largest annulus $D=\{z\in\mathbb{C}: r<|z|<R\}$ where this series converges.\\
+(ii) If $f: D\to\mathbb{C}$ is its sum on $D$, compute $\displaystyle\int_{|z|=2} (f(z))^2\,dz$.
+\end{card}
+\begin{card}{(i) Largest Annulus}
+We treat each as a geometric series. For $\sum_{n=1}^{\infty} z^{-n} = \sum_{n=1}^{\infty} (1/z)^n$, convergence requires $|1/z|<1$, i.e. $|z|>1$. For $\sum_{n=0}^{\infty} (z/5)^n$, convergence requires $|z/5|<1$, i.e. $|z|<5$. Hence the largest annulus is
+\[ D = \{ z\in\mathbb{C} : 1<|z|<5 \}. \]
+On $D$,
+\[ \sum_{n=1}^{\infty} z^{-n} = \frac{1}{z-1}, \qquad \sum_{n=0}^{\infty} (z/5)^n = \frac{1}{1-z/5} = \frac{5}{5-z}. \]
+Therefore $\displaystyle f(z) = \frac{1}{z-1} + \frac{5}{5-z} = \frac{1}{z-1} - \frac{5}{z-5}$.
+\end{card}
+\begin{card}{(ii) Compute $\int_{|z|=2} (f(z))^2\,dz$}
+Poles of $f$ are at $z=1,5$. On $|z|=2$, only $z=1$ lies inside.
+\subsubsection*{Method A (principal part)}
+Write $f(z)=\dfrac{1}{z-1}+a(z)$ with $a(z)=-\dfrac{5}{z-5}$ analytic near $1$ and $a(1)=\dfrac{5}{4}$. Then
+\[ f(z)^2 = \frac{1}{(z-1)^2} + \frac{2a(1)}{z-1} + \cdots, \quad\text{so}\quad \operatorname{Res}_{z=1} f^2 = 2a(1)=\frac{5}{2}. \]
+Hence $\displaystyle \int_{|z|=2} (f(z))^2\,dz = 2\pi i\cdot\frac{5}{2} = 5\pi i$.
+\subsubsection*{Method B (algebraic expansion)}
+\[ (f(z))^2 = \left(\frac{1}{z-1} - \frac{5}{z-5}\right)^2 = \frac{1}{(z-1)^2} - \frac{10}{(z-1)(z-5)} + \frac{25}{(z-5)^2}. \]
+Only the middle term contributes a simple pole at $z=1$ with residue $-\dfrac{10}{1-5}=\dfrac{5}{2}$. The integral is $2\pi i\cdot \dfrac{5}{2}=5\pi i$.
+\subsubsection*{Method C (order-2 pole formula)}
+For a double pole, $\operatorname{Res}_{z=1} f^2 = \displaystyle \lim_{z\to 1} \frac{d}{dz}((z-1)^2 f(z)^2)$, yielding $\dfrac{5}{2}$, hence $5\pi i$.
+\medskip\noindent\textbf{Answer.} $\displaystyle D=\{1<|z|<5\}$ and $\displaystyle \int_{|z|=2} (f(z))^2\,dz = 5\pi i$.
+\end{card}
+\end{document}
+</code></pre>
+      <p class="mt-2 text-xs text-slate-400">Copy and paste into Overleaf to get a fully-styled PDF. Colors assume dark page; remove \pagecolor if you prefer white.</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-10 text-center text-xs text-slate-400">
+      Built with Tailwind and KaTeX. All derivations verified by multiple methods.
+    </footer>
+  </main>
+
+  <script>
+    const btn = document.getElementById('copyBtn');
+    btn?.addEventListener('click', async () => {
+      const text = document.getElementById('latexBlock')?.innerText || '';
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = 'Copy'), 1400);
+      } catch (e) {
+        btn.textContent = 'Copy failed';
+        setTimeout(() => (btn.textContent = 'Copy'), 1400);
+      }
+    });
+  </script>
+</body>
+</html>
